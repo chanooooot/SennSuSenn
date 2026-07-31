@@ -232,6 +232,7 @@ function frame(ts) {
     if (matchElapsed >= 15000) {
       const s = ARENA.getScores();
       winnerText = s[0] === s[1] ? 'Tie!' : (s[0] > s[1] ? 'Player 1 wins!' : 'Player 2 wins!');
+      console.log('raw scores', s, 'grip', creatures[0].traits.grip, creatures[1].traits.grip);
       state = 'result';
       renderUI();
     }

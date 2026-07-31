@@ -5,12 +5,13 @@ const ARENA = (() => {
   const { Engine, World, Bodies, Body } = Matter;
 
   const PLATFORM_Y = 900;
-  const HILL_MIN = 330, HILL_MAX = 390;
+  const HILL_MIN = 270, HILL_MAX = 450;
   const CENTER_X = 360;
   const FORCE_COEF = 0.006;
   const FALL_Y = 1200;
   const RESPAWN_MS = 1000;
   const SPAWN_X = [180, 540];
+  const SPAWN_Y = [700, 620];
 
   let engine, world;
   let creatures = [];
@@ -25,7 +26,7 @@ const ARENA = (() => {
     World.add(world, Bodies.rectangle(360, 920, 640, 40, { isStatic: true }));
 
     creatures = bodies.map((body, i) => {
-      Body.setPosition(body, { x: SPAWN_X[i], y: 700 });
+      Body.setPosition(body, { x: SPAWN_X[i], y: SPAWN_Y[i] });
       Body.setVelocity(body, { x: 0, y: 0 });
       World.add(world, body);
       return { body, fallen: false, respawnAt: 0 };
