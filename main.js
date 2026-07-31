@@ -247,6 +247,10 @@ function frame(ts) {
     ctx.fillText(`P1: ${(scores[0] / 60).toFixed(1)}`, 360, 570);
     ctx.fillStyle = COLORS[1];
     ctx.fillText(`P2: ${(scores[1] / 60).toFixed(1)}`, 360, 610);
+
+    ctx.fillStyle = '#888';
+    ctx.font = '18px sans-serif';
+    ctx.fillText(`raw ${scores[0]}/${scores[1]}  grip ${creatures[0].traits.grip.toFixed(2)}/${creatures[1].traits.grip.toFixed(2)}`, 360, 660);
   }
 
   requestAnimationFrame(frame);
