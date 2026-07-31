@@ -7,7 +7,7 @@ const ARENA = (() => {
   const PLATFORM_Y = 900;
   const HILL_MIN = 270, HILL_MAX = 450;
   const CENTER_X = 360;
-  const FORCE_COEF = 0.00015;
+  const FORCE_COEF = 0.0003;
   const FALL_Y = 1200;
   const RESPAWN_MS = 1000;
   const SPAWN_X = [180, 540];

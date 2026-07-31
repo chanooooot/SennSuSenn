@@ -63,7 +63,7 @@ Logical canvas: **720 × 1280**, scaled to fit viewport, portrait locked.
 | Platform | Static rectangle, x 40→680 (width 640), top surface at y=900, thickness 40 |
 | Hill zone | x 270→450 (width 180), centered at x=360, rendered as a soft band on the platform |
 | Gravity | Matter default, y = 1.0 |
-| Inward force | Applied every tick toward x=360. `F = mass * 0.00015`, horizontal only. Scaled by mass so both creatures accelerate identically regardless of shape |
+| Inward force | Applied every tick toward x=360. `F = mass * 0.0003`, horizontal only. Scaled by mass so both creatures accelerate identically regardless of shape |
 | Spawn | P1 at x=180 y=700, P2 at x=540 y=700, zero velocity |
 | Fall threshold | y > 1200 |
 | Respawn | 1000ms delay, then reappear at x=80 (fell left) or x=640 (fell right), y=700, zero velocity |
