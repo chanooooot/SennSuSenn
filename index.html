@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>SennSuSenn</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    overflow: hidden;
+  }
+  #game {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  #rotate-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #111;
+    color: #fff;
+    font: 20px/1.4 sans-serif;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  body.landscape #rotate-overlay {
+    display: flex;
+  }
+  body.landscape #game {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="game" width="720" height="1280"></canvas>
+<div id="rotate-overlay">Rotate your phone<br>to portrait</div>
+
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js"></script>
+<script src="creature.js"></script>
+<script src="arena.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
