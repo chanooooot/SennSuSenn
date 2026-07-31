@@ -1,8 +1,8 @@
 // creature.js — strokes -> physics body (SPEC §4).
-// Phase 1: convex hull only. Concave decomposition lands in Phase 2.
 // Frozen seam (D5): knows nothing about arena, hills, or scoring.
 
 const CREATURE = (() => {
+  const stats = { total: 0, fallback: 0 };
   function perpDist(p, a, b) {
     const dx = b.x - a.x, dy = b.y - a.y;
     const len = Math.hypot(dx, dy) || 1e-6;
@@ -49,31 +49,82 @@ const CREATURE = (() => {
     return h;
   }
 
+  function polygonSelfIntersects(pts) {
+    const n = pts.length;
+    function ccw(a, b, c) { return (c.y - a.y) * (b.x - a.x) - (b.y - a.y) * (c.x - a.x); }
+    function segInt(p1, p2, p3, p4) {
+      const d1 = ccw(p3, p4, p1), d2 = ccw(p3, p4, p2), d3 = ccw(p1, p2, p3), d4 = ccw(p1, p2, p4);
+      return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+    }
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        if (Math.abs(i - j) <= 1 || (i === 0 && j === n - 1)) continue;
+        if (segInt(pts[i], pts[(i + 1) % n], pts[j], pts[(j + 1) % n])) return true;
+      }
+    }
+    return false;
+  }
+
+  // Sanitizer + poly-decomp attempt. Returns array of convex parts, or null on any failure
+  // (self-intersection, sliver, decomp exception, zero parts) — caller falls back to hull.
+  function tryDecompose(outline) {
+    try {
+      if (outline.length < 3) return null;
+      if (Math.abs(Matter.Vertices.area(outline)) < 20) return null;
+      if (polygonSelfIntersects(outline)) return null;
+
+      const raw = decomp.quickDecomp(outline.map(p => [p.x, p.y]));
+      if (!raw || raw.length === 0) return null;
+
+      const parts = raw
+        .map(part => capVertices(part.map(v => ({ x: v[0], y: v[1] })), 24))
+        .filter(v => v.length >= 3 && Math.abs(Matter.Vertices.area(v)) > 20);
+
+      return parts.length > 0 ? parts : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function fromStrokes(rawStrokes) {
     const strokes = decimateAll(rawStrokes);
     const allPoints = strokes.flat();
-    let hull = Matter.Vertices.hull(allPoints);
-    hull = capVertices(hull, 24);
 
-    const area = Math.abs(Matter.Vertices.area(hull));
+    stats.total++;
+    let parts = tryDecompose(allPoints);
+    let area, perimeterPoly;
+
+    if (parts) {
+      perimeterPoly = allPoints;
+      area = Math.abs(Matter.Vertices.area(allPoints));
+    } else {
+      stats.fallback++;
+      let hull = Matter.Vertices.hull(allPoints);
+      hull = capVertices(hull, 24);
+      parts = [hull];
+      perimeterPoly = hull;
+      area = Math.abs(Matter.Vertices.area(hull));
+    }
+    console.log(`creature: fallback ${stats.fallback}/${stats.total} (${Math.round(100 * stats.fallback / stats.total)}%)`);
+
     let perimeter = 0;
-    for (let i = 0; i < hull.length; i++) {
-      const a = hull[i], b = hull[(i + 1) % hull.length];
+    for (let i = 0; i < perimeterPoly.length; i++) {
+      const a = perimeterPoly[i], b = perimeterPoly[(i + 1) % perimeterPoly.length];
       perimeter += Math.hypot(b.x - a.x, b.y - a.y);
     }
     const isoperimetricRatio = (perimeter * perimeter) / (4 * Math.PI * area);
     const grip = Math.min(0.9, Math.max(0.3, 0.3 + 0.5 * (isoperimetricRatio - 1)));
 
-    const xs = hull.map(p => p.x), ys = hull.map(p => p.y);
+    const xs = allPoints.map(p => p.x), ys = allPoints.map(p => p.y);
     const w = Math.max(...xs) - Math.min(...xs);
     const h = Math.max(...ys) - Math.min(...ys) || 1;
     const aspectRatio = w / h;
 
     const scale = Math.sqrt(9000 / area);
-    const scaledHull = hull.map(p => ({ x: p.x * scale, y: p.y * scale }));
-    const centre = Matter.Vertices.centre(scaledHull);
+    const scaledParts = parts.map(part => part.map(p => ({ x: p.x * scale, y: p.y * scale })));
+    const centre = Matter.Vertices.centre(scaledParts.flat());
 
-    const body = Matter.Bodies.fromVertices(0, 0, [scaledHull], {
+    const body = Matter.Bodies.fromVertices(0, 0, scaledParts, {
       friction: grip,
       restitution: 0.2,
       frictionAir: 0.01
@@ -92,5 +143,5 @@ const CREATURE = (() => {
     };
   }
 
-  return { fromStrokes };
+  return { fromStrokes, stats };
 })();
