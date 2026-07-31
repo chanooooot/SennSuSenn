@@ -5,7 +5,7 @@ const ARENA = (() => {
   const { Engine, World, Bodies, Body } = Matter;
 
   const PLATFORM_Y = 900;
-  const HILL_MIN = 310, HILL_MAX = 410;
+  const HILL_MIN = 330, HILL_MAX = 390;
   const CENTER_X = 360;
   const FORCE_COEF = 0.006;
   const FALL_Y = 1200;

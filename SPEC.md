@@ -61,7 +61,7 @@ Logical canvas: **720 × 1280**, scaled to fit viewport, portrait locked.
 | Element | Value |
 |---|---|
 | Platform | Static rectangle, x 40→680 (width 640), top surface at y=900, thickness 40 |
-| Hill zone | x 310→410 (width 100), centered at x=360, rendered as a soft band on the platform |
+| Hill zone | x 330→390 (width 60), centered at x=360, rendered as a soft band on the platform |
 | Gravity | Matter default, y = 1.0 |
 | Inward force | Applied every tick toward x=360. `F = mass * 0.0006`, horizontal only. Scaled by mass so both creatures accelerate identically regardless of shape |
 | Spawn | P1 at x=180, P2 at x=540, both y=700, zero velocity |
