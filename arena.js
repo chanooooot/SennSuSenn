@@ -1,4 +1,4 @@
-// arena.js — platform, hill zone, inward force, fall/respawn, scoring (SPEC §3, §5).
+// arena.js — platform, hill zone, auto-lunge, fall/respawn, scoring (SPEC §3, §5).
 // Frozen seam (D5): never reaches into stroke data, only { body }.
 
 const ARENA = (() => {
@@ -7,7 +7,10 @@ const ARENA = (() => {
   const PLATFORM_Y = 900;
   const HILL_MIN = 270, HILL_MAX = 450;
   const CENTER_X = 360;
-  const FORCE_COEF = 0.0003;
+  // PROTOTYPE: recurring equal impulses replace the stable center attractor.
+  const LUNGE_TICKS = 60;
+  const LUNGE_X = 2.5;
+  const LUNGE_Y = -4;
   const FALL_Y = 1200;
   const STEP_MS = 1000 / 60;
   const RESPAWN_TICKS = 60;
@@ -39,11 +42,18 @@ const ARENA = (() => {
   }
 
   function update() {
-    creatures.forEach((c) => {
-      if (c.fallen) return;
-      const dir = Math.sign(CENTER_X - c.body.position.x);
-      Body.applyForce(c.body, c.body.position, { x: dir * c.body.mass * FORCE_COEF, y: 0 });
-    });
+    if ((ticks + 1) % LUNGE_TICKS === 0) {
+      creatures.forEach((c, i) => {
+        if (c.fallen) return;
+        const opponent = creatures[1 - i];
+        const targetX = opponent && !opponent.fallen ? opponent.body.position.x : CENTER_X;
+        const dir = Math.sign(targetX - c.body.position.x) || (i === 0 ? 1 : -1);
+        Body.setVelocity(c.body, {
+          x: c.body.velocity.x + dir * LUNGE_X,
+          y: Math.min(c.body.velocity.y, LUNGE_Y)
+        });
+      });
+    }
 
     Engine.update(engine, STEP_MS);
     ticks++;

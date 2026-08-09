@@ -7,7 +7,8 @@ const ui = document.getElementById('ui');
 const DRAW_BOX = { x: 80, y: 200, w: 560, h: 560 };
 const COLORS = ['#E14B3B', '#2E6FD9'];
 const STEP_MS = 1000 / 60;
-const MATCH_TICKS = 900;
+// PROTOTYPE: short match for the auto-lunge fun test.
+const MATCH_TICKS = 480;
 
 let state = 'home';
 let strokes = [], currentStroke = null;
