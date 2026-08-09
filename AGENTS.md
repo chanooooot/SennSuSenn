@@ -44,7 +44,7 @@ SennSuSenn (เส้นสู้เส้น, "line fights line"). Mobile web g
 5. Scale uniformly to hull area = 9000px²
 6. `Body.setMass(body, 1.0)`
 7. Friction = `clamp(0.3 + 0.5 * (isoperimetricRatio - 1), 0.3, 0.9)` where ratio = `perimeter² / (4π · area)`
-8. Fixed: `restitution = 0.2`, `frictionAir = 0.01`
+8. Fixed: `restitution = 0.4`, `frictionAir = 0.01`
 9. Return `{ body, traits, strokes }`
 
 **Rendering:** draw the ORIGINAL strokes transformed by body position + angle. Never render the hull. 6px round-cap lines. P1 red `#E14B3B`, P2 blue `#2E6FD9`. Light arena background, dark platform, soft hill band. No glow, no smoothing, no texture.

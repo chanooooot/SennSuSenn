@@ -250,7 +250,7 @@ const CREATURE = (() => {
 
     const bodyOptions = {
       friction: grip,
-      restitution: 0.2,
+      restitution: 0.4,
       frictionAir: 0.01
     };
     const bodyParts = localParts.map(part => Matter.Body.create({

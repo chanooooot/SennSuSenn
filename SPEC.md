@@ -97,7 +97,7 @@ Side view. Gravity pulls down, inward force pushes horizontally. "Toppling" and 
 | Grip | Isoperimetric ratio `perimeter² / (4π · area)`, 1.0 = perfect circle | Sets friction: `clamp(0.3 + 0.5 * (ratio - 1), 0.3, 0.9)`. Spiky shapes catch and snag |
 | Topple risk | Center of mass height from hull | Automatic from Matter.js body construction |
 
-Fixed for all creatures: `restitution = 0.2`, `frictionAir = 0.01`.
+Fixed for all creatures: `restitution = 0.4`, `frictionAir = 0.01`.
 
 **No named trait labels. No stat display.** Players learn by watching. This is D12.
 

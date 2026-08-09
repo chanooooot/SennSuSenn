@@ -42,9 +42,10 @@ This experiment intentionally overrides the 15-second match and constant inward 
 - Match: 480 ticks / 8.0 seconds.
 - Pulse: every 60 ticks, starting at 1.0 seconds.
 - Both active creatures receive the same bounded upward velocity and horizontal impulse toward the opponent.
+- Contact-lock fix: creature restitution is 0.4, approved by Ham after the first phone run.
 - No player controls, P3 chaos, new files, dependencies, or seam changes.
 - Own JS: 21,427 bytes.
-- Automated tap, square, hook, and wide matchups: longest standstill 0.03–0.53 seconds.
+- The earlier motion-only check missed bodies moving together while touching. The minimized physics repro improved from 4.95 seconds of continuous contact at restitution 0.2 to 0.02 seconds at 0.4; the full closed-square creature regression now clears within 0.10 seconds.
 - Mixed-shape scores diverged: `350/294`, `349/359`, and `349/111`.
 - 30fps and 60fps scenario: `350/294`, exactly 480 physics ticks in both runs.
 
@@ -67,7 +68,7 @@ Keep the fallback-frequency console log and temporary raw-score/grip result diag
 ## Next steps
 
 1. On Ham's phone, hard-refresh the deployed URL and confirm matches last 8.0 seconds with visible lunges every second.
-2. Run 10 hot-seat matches with varied shapes. Pass only with at least 3 spontaneous laugh/WTF reactions and no recurring frozen-center matches.
+2. Run 10 hot-seat matches with varied flat, closed, and hooked shapes. Pass only with at least 3 spontaneous laugh/WTF reactions and no recurring touch-locks.
 3. If the experiment passes, update `SPEC.md`, `BUILD_PLAN.md`, `AGENTS.md`, and `CLAUDE.md` before further implementation.
 4. If it fails, revert the prototype and restore permanent stop state.
 5. Keep P3–P5 blocked until Ham explicitly confirms the new gate result.

@@ -27,7 +27,7 @@ Report after each phase: what shipped, the deployed URL, what to test, known iss
 
 1. **Draw screen.** 560×560 draw box, finger drawing, multi-stroke (max 5), undo, clear, confirm. P1 red, P2 blue.
 2. **`creature.js` v1** — strokes → RDP decimate → **convex hull** → scale to 9000px² → `Body.setMass(1.0)` → return `{ body, traits, strokes }`.
-   - Traits: friction from isoperimetric ratio per SPEC §4. Restitution 0.2, frictionAir 0.01.
+   - Traits: friction from isoperimetric ratio per SPEC §4. Restitution 0.4, frictionAir 0.01.
    - **Concave decomposition is NOT in this phase.** Hull only.
 3. **`arena.js` v1** — platform, hill zone, gravity, inward force, fall detection, 1s respawn, per-tick scoring.
 4. **`main.js`** — state machine: home → P1 draw → handover → P2 draw → 3s countdown → 15s match → result → rematch.
