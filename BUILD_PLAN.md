@@ -139,5 +139,5 @@ If the gate fails, the honest options are: abandon, or try the steer-mode toggle
 
 - **poly-decomp on freehand strokes (P2):** the sanitizer + hull fallback IS the fix. Tune the sanitizer thresholds. Do not redesign the pipeline.
 - **iOS Safari MediaRecorder (P4):** 1-hour timebox → screenshot fallback. Do not spend a day on codec negotiation.
-- **Inward force tuning (P1):** if creatures reach the center too fast or stall, adjust the `0.0006` coefficient only. Do not add steering, do not add a second force.
+- **Inward force tuning (P1):** if creatures reach the center too fast or stall, adjust the `0.0003` coefficient only. Do not add steering, do not add a second force.
 - **Bodies interpenetrating at spawn (P2):** increase spawn separation or spawn height before touching solver settings.

@@ -9,57 +9,61 @@ const ARENA = (() => {
   const CENTER_X = 360;
   const FORCE_COEF = 0.0003;
   const FALL_Y = 1200;
-  const RESPAWN_MS = 1000;
+  const STEP_MS = 1000 / 60;
+  const RESPAWN_TICKS = 60;
   const SPAWN_X = [180, 540];
   const SPAWN_Y = [700, 700];
 
   let engine, world;
   let creatures = [];
   let scores = [0, 0];
-  let elapsed = 0;
+  let ticks = 0;
 
-  function init(bodies) {
+  function init(creatureObjects) {
     engine = Engine.create();
     world = engine.world;
     world.gravity.y = 1.0;
 
     World.add(world, Bodies.rectangle(360, 920, 640, 40, { isStatic: true }));
 
-    creatures = bodies.map((body, i) => {
+    creatures = creatureObjects.map((creature, i) => {
+      const body = creature.body;
       Body.setPosition(body, { x: SPAWN_X[i], y: SPAWN_Y[i] });
       Body.setVelocity(body, { x: 0, y: 0 });
       World.add(world, body);
-      return { body, fallen: false, respawnAt: 0 };
+      return { body, fallen: false, respawnAt: 0, respawnX: 0 };
     });
 
     scores = [0, 0];
-    elapsed = 0;
+    ticks = 0;
   }
 
-  function update(deltaMs) {
+  function update() {
     creatures.forEach((c) => {
       if (c.fallen) return;
       const dir = Math.sign(CENTER_X - c.body.position.x);
       Body.applyForce(c.body, c.body.position, { x: dir * c.body.mass * FORCE_COEF, y: 0 });
     });
 
-    Engine.update(engine, deltaMs);
-    elapsed += deltaMs;
+    Engine.update(engine, STEP_MS);
+    ticks++;
 
     creatures.forEach((c, i) => {
       if (c.fallen) {
-        if (elapsed >= c.respawnAt) {
-          const x = c.body.position.x < CENTER_X ? 80 : 640;
-          Body.setPosition(c.body, { x, y: 700 });
+        if (ticks >= c.respawnAt) {
+          Body.setPosition(c.body, { x: c.respawnX, y: 700 });
           Body.setVelocity(c.body, { x: 0, y: 0 });
           Body.setAngularVelocity(c.body, 0);
+          World.add(world, c.body);
           c.fallen = false;
         }
         return;
       }
       if (c.body.position.y > FALL_Y) {
+        c.respawnX = c.body.position.x < CENTER_X ? 80 : 640;
         c.fallen = true;
-        c.respawnAt = elapsed + RESPAWN_MS;
+        c.respawnAt = ticks + RESPAWN_TICKS;
+        World.remove(world, c.body);
       } else if (c.body.position.x > HILL_MIN && c.body.position.x < HILL_MAX && c.body.position.y < PLATFORM_Y) {
         scores[i] += 1;
       }
@@ -74,6 +78,7 @@ const ARENA = (() => {
   }
 
   function getScores() { return scores; }
+  function getTicks() { return ticks; }
 
-  return { init, update, render, getScores };
+  return { init, update, render, getScores, getTicks };
 })();

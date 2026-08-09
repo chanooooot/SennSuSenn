@@ -54,5 +54,5 @@ SennSuSenn (เส้นสู้เส้น, "line fights line"). A mobile web
 
 - **poly-decomp on freehand strokes (P2):** the sanitizer + convex hull fallback IS the specified fix. Tune sanitizer thresholds. Do not redesign the pipeline. 4-hour timebox.
 - **iOS Safari MediaRecorder (P4):** 1-hour timebox → permanent screenshot fallback. (fact) Do not spend a day on codecs.
-- **Inward force feel (P1):** adjust the `0.0006` coefficient only. Do not add a second force, do not add steering.
+- **Inward force feel (P1):** adjust the `0.0003` coefficient only. Do not add a second force, do not add steering.
 - **Spawn interpenetration (P2):** increase spawn separation or height before touching solver settings.

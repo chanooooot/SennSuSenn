@@ -5,13 +5,16 @@ const ctx = canvas.getContext('2d');
 const ui = document.getElementById('ui');
 
 const DRAW_BOX = { x: 80, y: 200, w: 560, h: 560 };
-const COLORS = ['#e33', '#39f'];
+const COLORS = ['#E14B3B', '#2E6FD9'];
+const STEP_MS = 1000 / 60;
+const MATCH_TICKS = 900;
 
 let state = 'home';
 let strokes = [], currentStroke = null;
 let creatures = [null, null];
 let countdownStart = 0;
-let matchElapsed = 0;
+let matchTicks = 0;
+let accumulator = 0;
 let winnerText = '';
 
 // ---------- layout / resize ----------
@@ -52,7 +55,7 @@ function renderUI() {
     btn('PLAY — Same Phone', 160, 700, 400, 80, () => startDraw(0));
     btn('Send Challenge (soon)', 160, 800, 400, 80, () => {}, true);
   } else if (state === 'draw') {
-    const canConfirm = strokes.some(s => s.length >= 3);
+    const canConfirm = strokes.some(s => s.length >= 1);
     btn('Undo', 80, 800, 170, 70, undoStroke);
     btn('Clear', 275, 800, 170, 70, clearStrokes);
     btn('Confirm', 470, 800, 170, 70, confirmDraw, !canConfirm);
@@ -97,7 +100,7 @@ canvas.addEventListener('pointermove', (e) => {
 });
 
 function endStroke() {
-  if (currentStroke && currentStroke.length >= 2) strokes.push(currentStroke);
+  if (currentStroke && currentStroke.length >= 1) strokes.push(currentStroke);
   currentStroke = null;
   renderUI();
 }
@@ -140,11 +143,17 @@ function drawBoxAndStrokes(colorIndex) {
   ctx.strokeStyle = '#555';
   ctx.strokeRect(DRAW_BOX.x, DRAW_BOX.y, DRAW_BOX.w, DRAW_BOX.h);
   ctx.strokeStyle = COLORS[colorIndex];
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 6;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   [...strokes, currentStroke].filter(Boolean).forEach(s => {
-    if (s.length < 2) return;
+    if (s.every(p => p.x === s[0].x && p.y === s[0].y)) {
+      ctx.fillStyle = COLORS[colorIndex];
+      ctx.beginPath();
+      ctx.arc(DRAW_BOX.x + s[0].x, DRAW_BOX.y + s[0].y, 3, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
     ctx.beginPath();
     ctx.moveTo(DRAW_BOX.x + s[0].x, DRAW_BOX.y + s[0].y);
     for (let i = 1; i < s.length; i++) ctx.lineTo(DRAW_BOX.x + s[i].x, DRAW_BOX.y + s[i].y);
@@ -156,11 +165,18 @@ function drawBoxAndStrokes(colorIndex) {
 function renderCreature(c, colorIndex) {
   const cos = Math.cos(c.body.angle), sin = Math.sin(c.body.angle);
   ctx.strokeStyle = COLORS[colorIndex];
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 6;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   c.strokes.forEach(s => {
-    if (s.length < 2) return;
+    if (s.length === 1) {
+      ctx.fillStyle = COLORS[colorIndex];
+      ctx.beginPath();
+      ctx.arc(c.body.position.x + s[0].x * cos - s[0].y * sin,
+              c.body.position.y + s[0].x * sin + s[0].y * cos, 3, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
     ctx.beginPath();
     s.forEach((p, i) => {
       const wx = c.body.position.x + p.x * cos - p.y * sin;
@@ -177,7 +193,7 @@ function frame(ts) {
   const dt = lastTs ? ts - lastTs : 16;
   lastTs = ts;
 
-  ctx.fillStyle = '#1a1a1a';
+  ctx.fillStyle = state === 'match' ? '#F5F1E8' : '#1a1a1a';
   ctx.fillRect(0, 0, 720, 1280);
 
   if (state === 'home') {
@@ -205,8 +221,9 @@ function frame(ts) {
     const secs = 3 - Math.floor((ts - countdownStart) / 1000);
     if (secs <= 0) {
       state = 'match';
-      matchElapsed = 0;
-      ARENA.init([creatures[0].body, creatures[1].body]);
+      matchTicks = 0;
+      accumulator = 0;
+      ARENA.init(creatures);
     } else {
       ctx.fillStyle = '#fff';
       ctx.font = '120px sans-serif';
@@ -214,7 +231,14 @@ function frame(ts) {
       ctx.fillText(String(secs), 360, 660);
     }
   } else if (state === 'match') {
-    ARENA.update(dt);
+    accumulator += Math.min(dt, 100);
+    let steps = 0;
+    while (accumulator >= STEP_MS && steps < 6 && matchTicks < MATCH_TICKS) {
+      ARENA.update();
+      accumulator -= STEP_MS;
+      matchTicks++;
+      steps++;
+    }
     ARENA.render(ctx);
     renderCreature(creatures[0], 0);
     renderCreature(creatures[1], 1);
@@ -228,8 +252,7 @@ function frame(ts) {
     ctx.textAlign = 'right';
     ctx.fillText((scores[1] / 60).toFixed(1), 660, 80);
 
-    matchElapsed += dt;
-    if (matchElapsed >= 15000) {
+    if (matchTicks === MATCH_TICKS) {
       const s = ARENA.getScores();
       winnerText = s[0] === s[1] ? 'Tie!' : (s[0] > s[1] ? 'Player 1 wins!' : 'Player 2 wins!');
       console.log('raw scores', s, 'grip', creatures[0].traits.grip, creatures[1].traits.grip);

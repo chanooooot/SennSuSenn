@@ -31,7 +31,7 @@ SennSuSenn (เส้นสู้เส้น, "line fights line"). Mobile web g
 - Platform: static rect, x 40→680, top surface y=900, thickness 40
 - Hill zone: x 270→450 (center x=360)
 - Gravity: y = 1.0
-- Inward force per tick toward x=360: `F = mass * 0.0006`, horizontal only
+- Inward force per tick toward x=360: `F = mass * 0.0003`, horizontal only
 - Spawn: P1 x=180, P2 x=540, both y=700
 - Fall: y > 1200 → remove → respawn after 1000ms at x=80 or x=640 (side fallen), y=700
 - Match: 15.0s after a 3s countdown
@@ -70,5 +70,5 @@ Direct, concise, bullets. Metrics first. Label **(fact)** vs **(opinion)**. One 
 
 - **poly-decomp on freehand strokes (P2):** sanitizer + hull fallback IS the fix. Tune thresholds, don't redesign. 4-hour timebox, then ship hull-only.
 - **iOS Safari MediaRecorder (P4):** 1-hour timebox → permanent screenshot fallback.
-- **Inward force feel (P1):** tune the `0.0006` coefficient only.
+- **Inward force feel (P1):** tune the `0.0003` coefficient only.
 - **Spawn interpenetration (P2):** increase separation or spawn height before touching solver settings.
