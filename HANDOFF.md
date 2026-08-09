@@ -6,7 +6,20 @@ Read `CLAUDE.md`, `SPEC.md`, and `BUILD_PLAN.md` first — they are the source o
 
 Deployed URL: https://chanooooot.github.io/SennSuSenn/ (GitHub Pages from `main`).
 
-P2 pre-gate repairs are implemented and locally verified. The P2 phone checks and 10-match kill gate have not run. Stop before P3 until Ham confirms at least 3/10 spontaneous laugh/WTF reactions.
+P2 pre-gate repairs are implemented, locally verified, and deployed from `main` at commit `e99d6de`.
+
+**STOP:** the 10-match P2 kill gate failed. Ham confirmed the passive matches are boring: creatures bump near the center, settle, and remain still. The optional steer-mode experiment was considered and rejected because no player control during the match is a core product decision.
+
+Active development is stopped. P3–P5 remain blocked. Resume only after Ham approves a new core-loop hypothesis and updates the settled decisions in `SPEC.md`.
+
+## Kill-gate result
+
+- Result: **FAIL** after 10 real matches.
+- Observed loop: initial collision followed by a long center standstill.
+- Deterministic diagnosis: identical tap creatures remain effectively motionless for 13.2 of 15 seconds; one creature alone settles at center for 9.8 seconds.
+- Zero friction, restitution 0.9, zero air friction, and inward-force changes did not remove the standstill.
+- Root cause: the flat arena, constant center attraction, and energy loss form a stable center equilibrium. This is a design outcome, not a Matter.js sleeping or render-timing bug.
+- Decision: preserve the no-control premise and stop rather than build steering or use P3 chaos to mask the failed core loop.
 
 ## P2 pre-gate repair
 
@@ -40,8 +53,7 @@ Keep the fallback-frequency console log and temporary raw-score/grip result diag
 
 ## Next steps
 
-1. On Ham's phone, verify the full flow, 15.0-second match, 1-second respawn, live scores, and 60fps.
-2. Across 20 drawings, confirm fallback is below 30% and a hook catches at least once in five matches.
-3. Remove only the temporary raw-score/grip diagnostics after calibration passes.
-4. Run 10 hot-seat matches. Continue only with at least 3 spontaneous laugh/WTF reactions.
-5. Keep P3–P5 blocked until Ham confirms the gate.
+1. Leave the deployed P2 build as a documented prototype; no further implementation is queued.
+2. If revisiting the idea, test a new passive core loop on paper or in a disposable prototype before changing this repo.
+3. Resume repository work only after Ham approves the new hypothesis and records the changed decisions in `SPEC.md`.
+4. Start from the kill gate again. P3–P5 stay blocked until the replacement loop is fun without chaos.
