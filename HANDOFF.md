@@ -8,7 +8,13 @@ Deployed URL: https://chanooooot.github.io/SennSuSenn/ (GitHub Pages from `main`
 
 Current deployed experiment: commit `60351cc` (automatic lunges plus the restitution 0.4 contact-lock fix).
 
-Uncommitted on `main`: two normalization/friction bug fixes plus the hill-geometry experiment below. Not yet on Ham's phone.
+Deployed and confirmed: **build 3** (`?v=3` on the script tags, "build 3" printed on the home screen).
+
+**Hill experiment result: Ham reports the game is "a lot better" on the phone.** The stable-centre standstill that failed the first kill gate is addressed. The hill is no longer a painted flat band; it is a real triangle and the apex is an unstable perch.
+
+Two defects from the standstill review remain unfixed, both needing Ham's approval because they touch settled decisions. Neither has been attempted yet.
+
+Cache note: GitHub Pages serves assets with `cache-control: max-age=600`, and an iOS Safari hard refresh does not reliably clear sub-resources. Two rounds were lost to this. The script tags now carry `?v=N` — **bump it on every deploy** — and the home screen prints the build number so a stale cache is visible in one glance.
 
 The P2 pre-gate repair baseline was implemented, locally verified, and deployed from `main` at commit `e99d6de`.
 
