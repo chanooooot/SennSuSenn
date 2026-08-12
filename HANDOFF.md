@@ -8,7 +8,11 @@ Deployed URL: https://chanooooot.github.io/SennSuSenn/ (GitHub Pages from `main`
 
 Current deployed experiment: commit `60351cc` (automatic lunges plus the restitution 0.4 contact-lock fix).
 
-Deployed and confirmed: **build 3** (`?v=3` on the script tags, "build 3" printed on the home screen).
+Deployed: **build 4** (`?v=4` on the script tags, "build 4" printed on the home screen).
+
+Build 4 adds exclusive scoring, approved by Ham. Only the creature nearest `x=360` scores, and only inside the zone; an exact distance tie awards nobody. **This changes D4 and D13** — update SPEC §2 and §5 if the gate passes. Measured over 480 ticks against real Matter: identical blobs `73/236`, blob vs wide bar `11/309`, tall vs wide `241/115`, and the sum never exceeds the tick count.
+
+Watch item: identical shapes now finish `73/236` rather than near-even, so solver ordering and float noise decide a symmetric match-up. Real play never uses identical creatures, so this is recorded rather than treated as a fairness break.
 
 **Hill experiment result: Ham reports the game is "a lot better" on the phone.** The stable-centre standstill that failed the first kill gate is addressed. The hill is no longer a painted flat band; it is a real triangle and the apex is an unstable perch.
 
