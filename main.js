@@ -204,6 +204,10 @@ function frame(ts) {
     ctx.fillText('เส้นสู้เส้น', 360, 400);
     ctx.font = '20px sans-serif';
     ctx.fillText('line fights line', 360, 440);
+    // Cache check: GitHub Pages caches for 10 minutes, so this says which build is running.
+    ctx.font = '16px sans-serif';
+    ctx.fillStyle = '#666';
+    ctx.fillText('build 3', 360, 1240);
   } else if (state === 'draw') {
     ctx.fillStyle = '#fff';
     ctx.font = '28px sans-serif';

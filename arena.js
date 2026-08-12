@@ -100,13 +100,13 @@ const ARENA = (() => {
   function render(ctx) {
     ctx.fillStyle = '#333';
     ctx.fillRect(40, 900, 640, 40);
+    // Solid, not a 0.25 alpha tint: over a #333 platform that tint was invisible.
+    ctx.fillStyle = 'rgba(255,210,60,0.9)';
     ctx.beginPath();
     ctx.moveTo(HILL_MIN, PLATFORM_Y);
     ctx.lineTo(CENTER_X, PLATFORM_Y - HUMP_RISE);
     ctx.lineTo(HILL_MAX, PLATFORM_Y);
     ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,210,60,0.25)';
     ctx.fill();
   }
 
