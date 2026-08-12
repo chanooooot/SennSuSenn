@@ -20,9 +20,14 @@ const ARENA = (() => {
   // unstable. Raise it to 1 once grip is measured on the silhouette instead.
   const GROUND_FRICTION = 0.35;
   // PROTOTYPE: recurring equal impulses replace the stable center attractor.
+  // Strength is what stops one creature running away with the match: at 2.5 nothing could
+  // dislodge whoever reached the apex first. Swept against real physics over 480 ticks,
+  // average margin / lead changes were 2.5 -> 238/2, 4 -> 197/2, 6 -> 134/7, 8 -> 72/4.
+  // Raising HUMP_RISE did nothing here (margin ~290 at 42, 64 and 90), and halving
+  // LUNGE_TICKS was far worse (366/0) because nobody settles long enough to score.
   const LUNGE_TICKS = 60;
-  const LUNGE_X = 2.5;
-  const LUNGE_Y = -4;
+  const LUNGE_X = 6;
+  const LUNGE_Y = -5;
   const FALL_Y = 1200;
   const STEP_MS = 1000 / 60;
   const RESPAWN_TICKS = 60;
