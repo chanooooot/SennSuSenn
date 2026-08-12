@@ -5,6 +5,7 @@ const CREATURE = (() => {
   const MAX_POINTS = 400;
   const MAX_VERTICES = 24;
   const RIBBON_WIDTH = 6;
+  const MAX_SPAN = 240;
   const MIN_AREA = 1;
   const stats = { total: 0, fallback: 0 };
 
@@ -240,7 +241,15 @@ const CREATURE = (() => {
     const height = Math.max(...ys) - Math.min(...ys) || 1;
     const aspectRatio = width / height;
 
-    const scale = Math.sqrt(9000 / Math.abs(Matter.Vertices.area(hull)));
+    // Area-only normalization blows thin strokes up past the 640px platform
+    // (a 560px line has ~3400px^2 of ribbon area -> 913px wide). Cap the span.
+    // ponytail: leaves such creatures ~2.5px thick. They cannot tunnel the 40px platform
+    // at ~10px/tick, but two thin bodies can pass through each other; if that shows up on
+    // the phone, build the ribbon at width 6/scale so final thickness is scale-independent.
+    const scale = Math.min(
+      Math.sqrt(9000 / Math.abs(Matter.Vertices.area(hull))),
+      MAX_SPAN / Math.max(width, height)
+    );
     const scaledParts = parts.map(part => part.map(p => ({ x: p.x * scale, y: p.y * scale })));
     const centre = areaWeightedCentre(scaledParts);
     const localParts = scaledParts.map(part => part.map(p => ({

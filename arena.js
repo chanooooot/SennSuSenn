@@ -7,6 +7,18 @@ const ARENA = (() => {
   const PLATFORM_Y = 900;
   const HILL_MIN = 270, HILL_MAX = 450;
   const CENTER_X = 360;
+  // EXPERIMENT: the hill is an actual hill. The apex is an unstable perch, so holding it
+  // is decided by centre-of-mass height and hull interlock instead of by settling first.
+  // Grip does NOT sort creatures here - see GROUND_FRICTION below.
+  // HUMP_RISE is the tuning knob: 42 over a 90 half-width is a 25deg slope.
+  const HUMP_RISE = 42;
+  // Matter pairs friction as min(a, b). The old platform carried no friction option, so
+  // Matter's default 0.1 silently clamped every creature's 0.3-0.9 grip and the trait did
+  // nothing. Grip is measured on the ribbon outline though, which pins it to 0.9 for any
+  // stroke over 27px, so grip has no range yet and THIS value is what actually binds.
+  // It must stay under tan(25deg) = 0.467 or creatures stick and the apex stops being
+  // unstable. Raise it to 1 once grip is measured on the silhouette instead.
+  const GROUND_FRICTION = 0.35;
   // PROTOTYPE: recurring equal impulses replace the stable center attractor.
   const LUNGE_TICKS = 60;
   const LUNGE_X = 2.5;
@@ -27,7 +39,12 @@ const ARENA = (() => {
     world = engine.world;
     world.gravity.y = 1.0;
 
-    World.add(world, Bodies.rectangle(360, 920, 640, 40, { isStatic: true }));
+    World.add(world, [
+      Bodies.rectangle(360, 920, 640, 40, { isStatic: true, friction: GROUND_FRICTION }),
+      // slope 1 makes trapezoid a triangle; its centroid sits a third of the rise up.
+      Bodies.trapezoid(CENTER_X, PLATFORM_Y - HUMP_RISE / 3, HILL_MAX - HILL_MIN, HUMP_RISE, 1,
+        { isStatic: true, friction: GROUND_FRICTION })
+    ]);
 
     creatures = creatureObjects.map((creature, i) => {
       const body = creature.body;
@@ -83,8 +100,14 @@ const ARENA = (() => {
   function render(ctx) {
     ctx.fillStyle = '#333';
     ctx.fillRect(40, 900, 640, 40);
+    ctx.beginPath();
+    ctx.moveTo(HILL_MIN, PLATFORM_Y);
+    ctx.lineTo(CENTER_X, PLATFORM_Y - HUMP_RISE);
+    ctx.lineTo(HILL_MAX, PLATFORM_Y);
+    ctx.closePath();
+    ctx.fill();
     ctx.fillStyle = 'rgba(255,210,60,0.25)';
-    ctx.fillRect(HILL_MIN, 900, HILL_MAX - HILL_MIN, 40);
+    ctx.fill();
   }
 
   function getScores() { return scores; }
