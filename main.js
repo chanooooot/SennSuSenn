@@ -207,7 +207,7 @@ function frame(ts) {
     // Cache check: GitHub Pages caches for 10 minutes, so this says which build is running.
     ctx.font = '16px sans-serif';
     ctx.fillStyle = '#666';
-    ctx.fillText('build 3', 360, 1240);
+    ctx.fillText('build 4', 360, 1240);
   } else if (state === 'draw') {
     ctx.fillStyle = '#fff';
     ctx.font = '28px sans-serif';

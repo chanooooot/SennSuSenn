@@ -75,7 +75,7 @@ const ARENA = (() => {
     Engine.update(engine, STEP_MS);
     ticks++;
 
-    creatures.forEach((c, i) => {
+    creatures.forEach((c) => {
       if (c.fallen) {
         if (ticks >= c.respawnAt) {
           Body.setPosition(c.body, { x: c.respawnX, y: 700 });
@@ -91,10 +91,23 @@ const ARENA = (() => {
         c.fallen = true;
         c.respawnAt = ticks + RESPAWN_TICKS;
         World.remove(world, c.body);
-      } else if (c.body.position.x > HILL_MIN && c.body.position.x < HILL_MAX && c.body.position.y < PLATFORM_Y) {
-        scores[i] += 1;
       }
     });
+
+    // Exclusive hill: only whoever is nearest x=360 scores, so the two scores can never
+    // sum past the tick count. Both creatures used to score at once and a 480-tick match
+    // ended 349/359 - the number could not tell a dramatic match from a dull one.
+    // An exact distance tie awards nobody, which float equality makes unreachable (D13).
+    let leader = -1, best = Infinity;
+    creatures.forEach((c, i) => {
+      if (c.fallen) return;
+      const p = c.body.position;
+      if (p.x <= HILL_MIN || p.x >= HILL_MAX || p.y >= PLATFORM_Y) return;
+      const distance = Math.abs(p.x - CENTER_X);
+      if (distance < best) { best = distance; leader = i; }
+      else if (distance === best) leader = -1;
+    });
+    if (leader >= 0) scores[leader] += 1;
   }
 
   function render(ctx) {
