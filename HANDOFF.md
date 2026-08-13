@@ -8,15 +8,17 @@ Deployed URL: https://chanooooot.github.io/SennSuSenn/ (GitHub Pages from `main`
 
 Current deployed experiment: commit `60351cc` (automatic lunges plus the restitution 0.4 contact-lock fix).
 
-Deployed: **build 4** (`?v=4` on the script tags, "build 4" printed on the home screen).
+Deployed: **build 5** (`?v=5` on the script tags, "build 5" printed on the home screen).
+
+**Hill experiment result: Ham reports the game is "a lot better" on the phone (build 3).** The stable-centre standstill that failed the first kill gate is addressed. The hill is no longer a painted flat band; it is a real triangle and the apex is an unstable perch.
 
 Build 4 adds exclusive scoring, approved by Ham. Only the creature nearest `x=360` scores, and only inside the zone; an exact distance tie awards nobody. **This changes D4 and D13** — update SPEC §2 and §5 if the gate passes. Measured over 480 ticks against real Matter: identical blobs `73/236`, blob vs wide bar `11/309`, tall vs wide `241/115`, and the sum never exceeds the tick count.
 
-Watch item: identical shapes now finish `73/236` rather than near-even, so solver ordering and float noise decide a symmetric match-up. Real play never uses identical creatures, so this is recorded rather than treated as a fairness break.
+Watch item: identical shapes now finish lopsided rather than near-even, so solver ordering and float noise decide a symmetric match-up. Real play never uses identical creatures, so this is recorded rather than treated as a fairness break.
 
-**Hill experiment result: Ham reports the game is "a lot better" on the phone.** The stable-centre standstill that failed the first kill gate is addressed. The hill is no longer a painted flat band; it is a real triangle and the apex is an unstable perch.
+Build 5 fixes a runaway leader Ham reported on build 4: one player pulled ahead early and stayed ahead. Not a hill-height problem — sweeping `HUMP_RISE` (42/64/90) left the average margin near 290 at every value, because nothing could dislodge whoever reached the apex first. The lunge is the only offensive force in the match; it was too weak. Swept `LUNGE_X`/`LUNGE_Y` against real physics over 480 ticks (avg margin / lead changes): `2.5` → 238/2, `4` → 197/2, **`6` → 134/7 (shipped)**, `8` → 72/4. Halving the lunge interval was worse (366/0 swaps) — nobody settles long enough to score. Match scores: blob vs bar `11/309 → 122/169`, tall vs wide `241/115 → 208/197`. Not yet confirmed on Ham's phone.
 
-Two defects from the standstill review remain unfixed, both needing Ham's approval because they touch settled decisions. Neither has been attempted yet.
+Defect 5 (grip has no dynamic range, see below) remains unfixed. It needs Ham's approval because it touches SPEC §4's grip formula. Not attempted yet — but pre-verified in the scratchpad: measuring the isoperimetric ratio on the silhouette instead of the ribbon gives grip spread `0.000 → 0.600` across line/circle/square/star/hook test shapes, so the fix is known to work before it's written.
 
 Cache note: GitHub Pages serves assets with `cache-control: max-age=600`, and an iOS Safari hard refresh does not reliably clear sub-resources. Two rounds were lost to this. The script tags now carry `?v=N` — **bump it on every deploy** — and the home screen prints the build number so a stale cache is visible in one glance.
 
@@ -75,15 +77,15 @@ Ham's report: creatures either do not move or move very little. Four defects fou
 
 Defect 5 is why ground friction is `0.35` and not `1`. With grip pinned at 0.9, setting ground friction to `1` would make `min(a, b)` = 0.9 for every creature — far above the hill's `tan(25°) = 0.467` — so nothing would ever slide and the standstill would get **worse**. Until grip has real range, ground friction is the effective global friction, and it is deliberately set below the slope so the apex stays unstable.
 
-## Hill experiment (uncommitted)
+## Hill experiment (deployed, build 3+)
 
 The root cause HANDOFF already named — flat arena plus centre attraction plus energy loss equals a **stable** equilibrium — is still unaddressed. The game is called King of the Hill and SPEC §3 renders the hill as a painted flat band. There is no hill.
 
 - A static triangle now sits on the platform across the hill zone: base `(270,900)`–`(450,900)`, apex `(360,858)`. Verified against Matter's `Bodies.trapezoid` slope-1 vertex math.
 - `HUMP_RISE = 42` over a 90px half-width is a **25° slope, tan 0.467**. Paired knob: `GROUND_FRICTION = 0.35`, held below that 0.467 so nothing can park on the slope.
 - The apex is an unstable perch, so settling first no longer wins. Because of defect 5 the contest is decided by centre-of-mass height and hull interlock, **not** by grip — grip is the same for both creatures.
-- Motion estimate: `LUNGE_Y = -4` gives a ~29-tick hop, and at `LUNGE_X = 2.5` that carries ~72px per lunge through the air where friction does not apply. Spawn to hill base is 90px, so contact should happen within about two lunges. `LUNGE_X` is left untouched so the hill stays the only variable.
-- **This contradicts SPEC §3** (platform as a single flat rectangle). Unsettled until the phone gate passes.
+- Lunge strength was raised in build 5 (`LUNGE_X` 2.5 → 6, `LUNGE_Y` -4 → -5) after Ham reported a runaway leader on build 4 — see the State section above.
+- **This contradicts SPEC §3** (platform as a single flat rectangle) and, as of build 4, D4/D13 (scoring). Unsettled until the phone gate passes.
 - No player control, no chaos events, no new files, no dependencies, no seam change.
 
 ## Local verification
@@ -104,16 +106,10 @@ Keep the fallback-frequency console log and temporary raw-score/grip result diag
 
 ## Next steps
 
-1. Ham decides the open question below before anything is deployed.
-2. Deploy, then do the 10-second visual check first: draw one straight line and confirm the creature is roughly a fifth of the platform width, not a bar spanning it. That check isolates the normalization fix from the hill.
-3. Then run **2 or 3 calibration matches, not the gate**. The knobs above were derived analytically and have never run on a phone. Confirm only: creatures reach the hill, they keep moving, nobody parks. If they creep and never make contact, the next single knob is `LUNGE_X`; if they slide off constantly and nobody holds the apex, it is `GROUND_FRICTION`. Do not spend the 10-match gate on an uncalibrated build.
-4. Then run 10 hot-seat matches with varied flat, closed, and hooked shapes. Pass only with at least 3 spontaneous laugh/WTF reactions and no recurring touch-locks.
-5. If the experiment passes, update `SPEC.md`, `BUILD_PLAN.md`, `AGENTS.md`, and `CLAUDE.md` before further implementation.
+1. Ham confirms build 5 on his phone: does the lead now swap during a match instead of one player running away with it early?
+2. If yes, run **2 or 3 more calibration matches** covering varied flat, closed, and hooked shapes — not the gate yet, because grip (defect 5) is still unfixed and every creature currently has identical friction.
+3. Decide on defect 5: fix grip by measuring the isoperimetric ratio on the silhouette instead of the ribbon (pre-verified spread `0.000 → 0.600`, needs Ham's approval — changes a SPEC §4 formula), or run the 10-match gate without it and treat grip as a later refinement.
+4. Run the 10 hot-seat match kill gate. Pass only with at least 3 spontaneous laugh/WTF reactions and no recurring touch-locks.
+5. If the experiment passes, update `SPEC.md`, `BUILD_PLAN.md`, `AGENTS.md`, and `CLAUDE.md` before further implementation — this build has diverged from SPEC §3 (hill geometry), §4 (grip formula, if defect 5 is fixed), and D4/D13 (exclusive scoring).
 6. If it fails, revert the prototype and restore permanent stop state.
 7. Keep P3–P5 blocked until Ham explicitly confirms the new gate result.
-
-## Open question for Ham
-
-Defect 1 (both creatures score at once) is deliberately still unfixed, so the hill is the only variable in this test. The last experiment changed match length, lunge, and restitution together and its results (`350/294`, `349/359`, `349/111`) taught nothing about which knob mattered.
-
-If the hill produces motion but the scores still land close together, the follow-up is exclusive scoring: only the creature nearer to `x=360` scores, and only inside the zone. Three lines, but it touches D4 and D13, so it needs Ham's approval before it is written.
