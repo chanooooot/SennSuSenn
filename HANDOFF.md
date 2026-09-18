@@ -88,7 +88,7 @@ The root cause HANDOFF already named — flat arena plus centre attraction plus 
 - **This contradicts SPEC §3** (platform as a single flat rectangle) and, as of build 4, D4/D13 (scoring). Unsettled until the phone gate passes.
 - No player control, no chaos events, no new files, no dependencies, no seam change.
 
-## Local verification
+## Local verification (P2 pre-gate baseline, pre-dates the auto-lunge experiment)
 
 - Own JS: 20,986 bytes; budget is under 40KB.
 - Syntax checks pass for `creature.js`, `arena.js`, and `main.js`.
@@ -97,6 +97,8 @@ The root cause HANDOFF already named — flat arena plus centre attraction plus 
 - Hook remains concave; self-crossing input triggers whole-creature fallback.
 - Identical scenario at 60fps and 30fps: `415/382`, exactly 900 physics ticks in both runs.
 - Respawn: exactly 60 ticks, recorded side preserved, position y=700, zero linear/angular velocity.
+
+See "Auto-lunge experiment" above for the current 480-tick/8s deployed numbers.
 
 Browser pointer/canvas smoke testing was unavailable in the verification session. Phone-only checks remain authoritative.
 

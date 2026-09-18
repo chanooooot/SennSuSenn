@@ -282,7 +282,8 @@ const CREATURE = (() => {
     return {
       body,
       traits: { aspectRatio, grip },
-      strokes: renderStrokes
+      strokes: renderStrokes,
+      source: strokes
     };
   }
 

@@ -84,7 +84,7 @@ function inBox(p) {
 }
 
 canvas.addEventListener('pointerdown', (e) => {
-  if (state !== 'draw' || strokes.length >= 5) return;
+  if (state !== 'draw' || currentStroke || strokes.length >= 5) return;
   const p = toLogical(e.clientX, e.clientY);
   if (!inBox(p)) return;
   currentStroke = [{ x: p.x - DRAW_BOX.x, y: p.y - DRAW_BOX.y }];
