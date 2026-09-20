@@ -8,7 +8,7 @@ Deployed URL: https://chanooooot.github.io/SennSuSenn/ (GitHub Pages from `main`
 
 Current deployed experiment: commit `60351cc` (automatic lunges plus the restitution 0.4 contact-lock fix).
 
-Deployed: **build 5** (`?v=5` on the script tags, "build 5" printed on the home screen).
+Deployed: **build 6** (`?v=6` on the script tags, "build 6" printed on the home screen). Build 6 = build 5 physics plus a multi-touch input fix: `pointermove`/`pointerup` now check `pointerId`, so a stray second finger neither appends to nor ends the first stroke. No physics change.
 
 **Hill experiment result: Ham reports the game is "a lot better" on the phone (build 3).** The stable-centre standstill that failed the first kill gate is addressed. The hill is no longer a painted flat band; it is a real triangle and the apex is an unstable perch.
 
@@ -60,7 +60,7 @@ This experiment intentionally overrides the 15-second match and constant inward 
 - Both active creatures receive the same bounded upward velocity and horizontal impulse toward the opponent.
 - Contact-lock fix: creature restitution is 0.4, approved by Ham after the first phone run.
 - No player controls, P3 chaos, new files, dependencies, or seam changes.
-- Own JS: 21,804 bytes.
+- Own JS: 25,345 bytes at build 5 (see build 6 note in State).
 - The earlier motion-only check missed bodies moving together while touching. The minimized physics repro improved from 4.95 seconds of continuous contact at restitution 0.2 to 0.02 seconds at 0.4; the full closed-square creature regression now clears within 0.10 seconds.
 - Mixed-shape scores diverged: `350/294`, `349/359`, and `349/111`.
 - 30fps and 60fps scenario: `350/294`, exactly 480 physics ticks in both runs.
@@ -108,10 +108,23 @@ Keep the fallback-frequency console log and temporary raw-score/grip result diag
 
 ## Next steps
 
-1. Ham confirms build 5 on his phone: does the lead now swap during a match instead of one player running away with it early?
-2. If yes, run **2 or 3 more calibration matches** covering varied flat, closed, and hooked shapes — not the gate yet, because grip (defect 5) is still unfixed and every creature currently has identical friction.
-3. Decide on defect 5: fix grip by measuring the isoperimetric ratio on the silhouette instead of the ribbon (pre-verified spread `0.000 → 0.600`, needs Ham's approval — changes a SPEC §4 formula), or run the 10-match gate without it and treat grip as a later refinement.
+1. **Ham tests build 6 on his phone** (home screen must read "build 6" — if it says 5, wait 10 minutes for the Pages cache and reload).
+   - Multi-touch: draw with one finger, rest a second finger inside the box mid-stroke, lift it. The stroke must continue unbroken and not end early.
+   - Lead swap: play 2 or 3 matches with different shapes. Does the lead change hands mid-match, or does one player run away with it early like build 4?
+2. Report both results. If the lead still runs away, the next knob is `LUNGE_X` (8 measured 72/4 in the sweep) — one variable, one deploy.
+3. Decide defect 5: fix grip by measuring the isoperimetric ratio on the silhouette instead of the ribbon (pre-verified spread `0.000 -> 0.600`, changes a SPEC §4 formula), or run the 10-match gate with grip flat. Recommendation (opinion): gate first, grip after.
 4. Run the 10 hot-seat match kill gate. Pass only with at least 3 spontaneous laugh/WTF reactions and no recurring touch-locks.
-5. If the experiment passes, update `SPEC.md`, `BUILD_PLAN.md`, `AGENTS.md`, and `CLAUDE.md` before further implementation — this build has diverged from SPEC §3 (hill geometry), §4 (grip formula, if defect 5 is fixed), and D4/D13 (exclusive scoring).
+5. If the gate passes, approve or reject the SPEC divergence ledger below, then update `SPEC.md` §2, `BUILD_PLAN.md`, `AGENTS.md`, and `CLAUDE.md` before further implementation.
 6. If it fails, revert the prototype and restore permanent stop state.
 7. Keep P3–P5 blocked until Ham explicitly confirms the new gate result.
+
+## SPEC divergence ledger (needs Ham's decision after the gate)
+
+| SPEC says | Code does |
+|---|---|
+| §5/§7 15 s match | `MATCH_TICKS = 480` (8 s) |
+| §3 flat platform + inward force 0.0003 | triangle hill + auto-lunge, no inward force |
+| §5 / D4 / D13 both creatures score per tick | exclusive: only the creature nearest x=360 scores |
+| §4 Confirm needs a stroke with >=3 points | any stroke, a tap becomes an octagon |
+
+Also: CLAUDE.md allows 5 files including `README.md`, which does not exist, while `AGENTS.md`, `HANDOFF.md`, and `STATUS.md` do. Amend the rule or the repo.

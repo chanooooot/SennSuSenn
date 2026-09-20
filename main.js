@@ -11,7 +11,7 @@ const STEP_MS = 1000 / 60;
 const MATCH_TICKS = 480;
 
 let state = 'home';
-let strokes = [], currentStroke = null;
+let strokes = [], currentStroke = null, strokePointerId = null;
 let creatures = [null, null];
 let countdownStart = 0;
 let matchTicks = 0;
@@ -88,11 +88,12 @@ canvas.addEventListener('pointerdown', (e) => {
   const p = toLogical(e.clientX, e.clientY);
   if (!inBox(p)) return;
   currentStroke = [{ x: p.x - DRAW_BOX.x, y: p.y - DRAW_BOX.y }];
+  strokePointerId = e.pointerId;
   canvas.setPointerCapture(e.pointerId);
 });
 
 canvas.addEventListener('pointermove', (e) => {
-  if (!currentStroke) return;
+  if (!currentStroke || e.pointerId !== strokePointerId) return;
   const p = toLogical(e.clientX, e.clientY);
   currentStroke.push({
     x: Math.min(Math.max(p.x - DRAW_BOX.x, 0), DRAW_BOX.w),
@@ -100,9 +101,12 @@ canvas.addEventListener('pointermove', (e) => {
   });
 });
 
-function endStroke() {
-  if (currentStroke && currentStroke.length >= 1) strokes.push(currentStroke);
+// Hot-seat on one phone: a stray second finger must not append to or end the first stroke.
+function endStroke(e) {
+  if (!currentStroke || e.pointerId !== strokePointerId) return;
+  strokes.push(currentStroke);
   currentStroke = null;
+  strokePointerId = null;
   renderUI();
 }
 canvas.addEventListener('pointerup', endStroke);
@@ -114,7 +118,7 @@ function clearStrokes() { strokes = []; renderUI(); }
 // ---------- state transitions ----------
 
 function startDraw(playerIndex) {
-  strokes = []; currentStroke = null;
+  strokes = []; currentStroke = null; strokePointerId = null;
   state = 'draw';
   drawingPlayer = playerIndex;
   renderUI();
@@ -207,7 +211,7 @@ function frame(ts) {
     // Cache check: GitHub Pages caches for 10 minutes, so this says which build is running.
     ctx.font = '16px sans-serif';
     ctx.fillStyle = '#666';
-    ctx.fillText('build 5', 360, 1240);
+    ctx.fillText('build 6', 360, 1240);
   } else if (state === 'draw') {
     ctx.fillStyle = '#fff';
     ctx.font = '28px sans-serif';
