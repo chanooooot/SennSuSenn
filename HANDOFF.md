@@ -111,17 +111,32 @@ Browser pointer/canvas smoke testing was unavailable in the verification session
 
 Keep the fallback-frequency console log and temporary raw-score/grip result diagnostics through the first phone calibration. After calibration passes, remove only the raw-score/grip result text and its matching console log.
 
-## Next steps
+## Next steps — Ham, do these in order
 
-1. **Ham tests build 7 on his phone** (home screen must read "build 7" — if it says 6, wait 10 minutes for the Pages cache and reload).
-   - Multi-touch: draw with one finger, rest a second finger inside the box mid-stroke, lift it. The stroke must continue unbroken and not end early.
-   - Lead swap: play 2 or 3 matches with different shapes. Does the lead change hands mid-match, or does one player run away with it early like build 4?
-2. Report both results. If the lead still runs away, the next knob is `LUNGE_X` (8 measured 72/4 in the sweep) — one variable, one deploy.
-3. Decide defect 5: fix grip by measuring the isoperimetric ratio on the silhouette instead of the ribbon (pre-verified spread `0.000 -> 0.600`, changes a SPEC §4 formula), or run the 10-match gate with grip flat. Recommendation (opinion): gate first, grip after.
-4. Run the 10 hot-seat match kill gate. Pass only with at least 3 spontaneous laugh/WTF reactions and no recurring touch-locks.
-5. If the gate passes, approve or reject the SPEC divergence ledger below, then update `SPEC.md` §2, `BUILD_PLAN.md`, `AGENTS.md`, and `CLAUDE.md` before further implementation.
-6. If it fails, revert the prototype and restore permanent stop state.
-7. Keep P3–P5 blocked until Ham explicitly confirms the new gate result.
+**Step 1 — Check the build (1 min).** Open https://chanooooot.github.io/SennSuSenn/ on the phone. Home screen must read **"build 7"**. If it says 6, wait 10 minutes and reload.
+
+**Step 2 — Smoke-test build 7 fixes (5 min, 4 matches).** Pass = all four look right.
+- [ ] **Tap:** Player 1 taps once and confirms. Creature shows as a big round blob (~113px), not a tiny dot, and bumps only where it is drawn.
+- [ ] **Scribble:** Zigzag back and forth fast over the same spot. Creature stays roughly the size you drew; nothing invisible pokes the opponent.
+- [ ] **Closed circle:** Draw one slow, careful circle that ends where it started. Creature appears, moves, and its score is a number (not `NaN`).
+- [ ] **Multi-touch:** While drawing, rest a second finger in the box, lift it. Stroke continues unbroken. Then press Undo mid-stroke: the stroke is gone and does not come back.
+
+**Step 3 — Lead-swap check (5 min, 3 matches, different shapes each time).** Does the lead change hands mid-match, or does one player run away early?
+
+**Step 4 — Report to Claude.** One line per item: Step 2 pass/fail per checkbox, Step 3 swap yes/no. Also say if long lines look too thin (they now draw ~3-5px, matching physics).
+- Lead still runs away → next change is `LUNGE_X` 6 → 8 (swept 72/4). One variable, one deploy.
+- Any Step 2 fail → describe the drawing; Claude fixes before the gate.
+
+**Step 5 — Decide grip (defect 5).** Fix now (silhouette ratio, pre-verified spread `0.000 -> 0.600`, changes SPEC §4) or run the gate with grip flat. Recommendation (opinion): gate first, grip after.
+
+**Step 6 — Run the 10-match kill gate** with a second person, hot-seat. Pass = at least 3 spontaneous laugh/WTF reactions and no recurring touch-locks. Tally reactions as you go.
+
+**Step 7 — After the gate.**
+- Pass → approve or reject the SPEC divergence ledger below; Claude then updates `SPEC.md` §2, `BUILD_PLAN.md`, `AGENTS.md`, `CLAUDE.md` before any P3 work.
+- Fail → revert the prototype, permanent stop state.
+- P3–P5 stay blocked until you confirm the gate result.
+
+**Also pending (any time):** file rule — CLAUDE.md lists `README.md` (missing) but not `AGENTS.md`/`HANDOFF.md`/`STATUS.md` (present). Pick: amend the rule, or change the repo.
 
 ## SPEC divergence ledger (needs Ham's decision after the gate)
 
