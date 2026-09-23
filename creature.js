@@ -19,7 +19,8 @@ const CREATURE = (() => {
 
   function perpDist(p, a, b) {
     const dx = b.x - a.x, dy = b.y - a.y;
-    const len = Math.hypot(dx, dy) || 1e-6;
+    const len = Math.hypot(dx, dy);
+    if (!len) return Math.hypot(p.x - a.x, p.y - a.y);
     return Math.abs((p.x - a.x) * dy - (p.y - a.y) * dx) / len;
   }
 
@@ -45,7 +46,7 @@ const CREATURE = (() => {
     let out = clean.map(s => s.slice());
     let epsilon = 1;
     while (out.reduce((n, s) => n + s.length, 0) > MAX_POINTS) {
-      out = clean.map(s => rdp(s, epsilon));
+      out = clean.map(s => removeConsecutiveDuplicates(rdp(s, epsilon)));
       epsilon *= 1.5;
     }
     return out;
@@ -90,7 +91,7 @@ const CREATURE = (() => {
       const previous = normals[i - 1], next = normals[i];
       const turn = previous.x * next.y - previous.y * next.x;
       const dot = previous.x * next.x + previous.y * next.y;
-      if (Math.abs(turn) < 1e-8 || turn * sign < 0) {
+      if (Math.abs(turn) < 1e-8 || turn * sign < 0 || 1 + dot < 0.25) {
         const first = reverse ? next : previous;
         const second = reverse ? previous : next;
         add(offset(stroke[i], first, sign));
@@ -283,6 +284,8 @@ const CREATURE = (() => {
       body,
       traits: { aspectRatio, grip },
       strokes: renderStrokes,
+      // Physics ribbon thickness after normalization, so the drawing matches the body (D15).
+      lineWidth: RIBBON_WIDTH * scale,
       source: strokes
     };
   }

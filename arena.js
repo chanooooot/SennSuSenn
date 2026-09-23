@@ -80,10 +80,10 @@ const ARENA = (() => {
     Engine.update(engine, STEP_MS);
     ticks++;
 
-    creatures.forEach((c) => {
+    creatures.forEach((c, i) => {
       if (c.fallen) {
         if (ticks >= c.respawnAt) {
-          Body.setPosition(c.body, { x: c.respawnX, y: 700 });
+          Body.setPosition(c.body, { x: c.respawnX, y: SPAWN_Y[i] });
           Body.setVelocity(c.body, { x: 0, y: 0 });
           Body.setAngularVelocity(c.body, 0);
           World.add(world, c.body);

@@ -6,9 +6,14 @@ Read `CLAUDE.md`, `SPEC.md`, and `BUILD_PLAN.md` first — they are the source o
 
 Deployed URL: https://chanooooot.github.io/SennSuSenn/ (GitHub Pages from `main`).
 
-Current deployed experiment: commit `60351cc` (automatic lunges plus the restitution 0.4 contact-lock fix).
+Deployed: **build 7** (`?v=7`, "build 7" on the home screen). Build 7 = build 6 plus creature-geometry fixes from a review, no arena tuning change:
 
-Deployed: **build 6** (`?v=6` on the script tags, "build 6" printed on the home screen). Build 6 = build 5 physics plus a multi-touch input fix: `pointermove`/`pointerup` now check `pointerId`, so a stray second finger neither appends to nor ends the first stroke. No physics change.
+- **NaN creature fixed.** `perpDist` returned 0 for every point when a segment's ends coincided, so `rdp` collapsed any exactly-closed stroke (once the drawing passed 400 points) into two identical points and the ribbon divided by zero. The creature was invisible, never scored or respawned, and the result read `NaN`. `perpDist` now falls back to point distance, and decimated strokes are deduped again.
+- **Invisible scribble spikes fixed.** The inner miter on a near-180° turn divided by `1 + dot` ~ 0 and threw a vertex hundreds of px out. A zigzag drawn 30px wide became a 240px body. Joins now bevel when `1 + dot < 0.25` (sanitizer threshold). Measured drawn/physics width after: loop 105/108, scribble 235/240, hairpin 236/240.
+- **Render thickness matches physics (D15).** Strokes draw at `RIBBON_WIDTH * scale` (`creature.lineWidth`). A tap now shows as its real 113px blob instead of a 6px dot. Trade-off: span-capped long lines draw ~3-5px thick.
+- Nits: Undo/Clear mid-stroke now drop the in-progress stroke; respawn uses `SPAWN_Y`; `main.js` reads `ARENA.getTicks()` instead of a duplicate counter.
+
+Build 6 (`?v=6` on the script tags, "build 6" printed on the home screen). Build 6 = build 5 physics plus a multi-touch input fix: `pointermove`/`pointerup` now check `pointerId`, so a stray second finger neither appends to nor ends the first stroke. No physics change.
 
 **Hill experiment result: Ham reports the game is "a lot better" on the phone (build 3).** The stable-centre standstill that failed the first kill gate is addressed. The hill is no longer a painted flat band; it is a real triangle and the apex is an unstable perch.
 
@@ -108,7 +113,7 @@ Keep the fallback-frequency console log and temporary raw-score/grip result diag
 
 ## Next steps
 
-1. **Ham tests build 6 on his phone** (home screen must read "build 6" — if it says 5, wait 10 minutes for the Pages cache and reload).
+1. **Ham tests build 7 on his phone** (home screen must read "build 7" — if it says 6, wait 10 minutes for the Pages cache and reload).
    - Multi-touch: draw with one finger, rest a second finger inside the box mid-stroke, lift it. The stroke must continue unbroken and not end early.
    - Lead swap: play 2 or 3 matches with different shapes. Does the lead change hands mid-match, or does one player run away with it early like build 4?
 2. Report both results. If the lead still runs away, the next knob is `LUNGE_X` (8 measured 72/4 in the sweep) — one variable, one deploy.

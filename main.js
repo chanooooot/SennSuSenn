@@ -14,7 +14,6 @@ let state = 'home';
 let strokes = [], currentStroke = null, strokePointerId = null;
 let creatures = [null, null];
 let countdownStart = 0;
-let matchTicks = 0;
 let accumulator = 0;
 let winnerText = '';
 
@@ -112,8 +111,9 @@ function endStroke(e) {
 canvas.addEventListener('pointerup', endStroke);
 canvas.addEventListener('pointercancel', endStroke);
 
-function undoStroke() { strokes.pop(); renderUI(); }
-function clearStrokes() { strokes = []; renderUI(); }
+// Drop any in-progress stroke too, or its pointerup would add it back after Undo/Clear.
+function undoStroke() { strokes.pop(); currentStroke = null; strokePointerId = null; renderUI(); }
+function clearStrokes() { strokes = []; currentStroke = null; strokePointerId = null; renderUI(); }
 
 // ---------- state transitions ----------
 
@@ -170,7 +170,7 @@ function drawBoxAndStrokes(colorIndex) {
 function renderCreature(c, colorIndex) {
   const cos = Math.cos(c.body.angle), sin = Math.sin(c.body.angle);
   ctx.strokeStyle = COLORS[colorIndex];
-  ctx.lineWidth = 6;
+  ctx.lineWidth = c.lineWidth;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   c.strokes.forEach(s => {
@@ -178,7 +178,7 @@ function renderCreature(c, colorIndex) {
       ctx.fillStyle = COLORS[colorIndex];
       ctx.beginPath();
       ctx.arc(c.body.position.x + s[0].x * cos - s[0].y * sin,
-              c.body.position.y + s[0].x * sin + s[0].y * cos, 3, 0, Math.PI * 2);
+              c.body.position.y + s[0].x * sin + s[0].y * cos, c.lineWidth / 2, 0, Math.PI * 2);
       ctx.fill();
       return;
     }
@@ -211,7 +211,7 @@ function frame(ts) {
     // Cache check: GitHub Pages caches for 10 minutes, so this says which build is running.
     ctx.font = '16px sans-serif';
     ctx.fillStyle = '#666';
-    ctx.fillText('build 6', 360, 1240);
+    ctx.fillText('build 7', 360, 1240);
   } else if (state === 'draw') {
     ctx.fillStyle = '#fff';
     ctx.font = '28px sans-serif';
@@ -230,7 +230,6 @@ function frame(ts) {
     const secs = 3 - Math.floor((ts - countdownStart) / 1000);
     if (secs <= 0) {
       state = 'match';
-      matchTicks = 0;
       accumulator = 0;
       ARENA.init(creatures);
     } else {
@@ -242,10 +241,9 @@ function frame(ts) {
   } else if (state === 'match') {
     accumulator += Math.min(dt, 100);
     let steps = 0;
-    while (accumulator >= STEP_MS && steps < 6 && matchTicks < MATCH_TICKS) {
+    while (accumulator >= STEP_MS && steps < 6 && ARENA.getTicks() < MATCH_TICKS) {
       ARENA.update();
       accumulator -= STEP_MS;
-      matchTicks++;
       steps++;
     }
     ARENA.render(ctx);
@@ -261,7 +259,7 @@ function frame(ts) {
     ctx.textAlign = 'right';
     ctx.fillText((scores[1] / 60).toFixed(1), 660, 80);
 
-    if (matchTicks === MATCH_TICKS) {
+    if (ARENA.getTicks() === MATCH_TICKS) {
       const s = ARENA.getScores();
       winnerText = s[0] === s[1] ? 'Tie!' : (s[0] > s[1] ? 'Player 1 wins!' : 'Player 2 wins!');
       console.log('raw scores', s, 'grip', creatures[0].traits.grip, creatures[1].traits.grip);
